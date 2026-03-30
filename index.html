@@ -4,6 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vasile & Victoria - Nunta</title>
+
+    <!-- Open Graph / Facebook / WhatsApp / iMessage -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://cares0107.github.io/wed/">
+    <meta property="og:title" content="Vasile & Victoria">
+    <meta property="og:description" content="Sunteți invitați la nunta noastră! 💍 11 Septembrie 2026">
+    <meta property="og:image" content="https://cares0107.github.io/wed/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Vasile & Victoria">
+    <meta name="twitter:description" content="Sunteți invitați la nunta noastră! 💍 11 Septembrie 2026">
+    <meta name="twitter:image" content="https://cares0107.github.io/wed/og-image.png">
+
+    <!-- General -->
+    <meta name="description" content="Sunteți invitați la nunta lui Vasile & Victoria! 💍 11 Septembrie 2026">
+
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💍</text></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -470,9 +489,10 @@
             50% { box-shadow: 0 4px 20px rgba(154, 140, 94, 0.5); }
         }
 
-        .music-btn .icon-pause { display: none; }
-        .music-btn.playing .icon-play { display: none; }
-        .music-btn.playing .icon-pause { display: block; }
+        .music-btn .icon-play { display: none; }
+        .music-btn .icon-pause { display: block; }
+        .music-btn.playing .icon-play { display: block; }
+        .music-btn.playing .icon-pause { display: none; }
 
         /* Falling Petals Animation */
         .petals {
@@ -1139,12 +1159,10 @@
             </svg>
         </button>
 
-        <!-- Background Music (audio.com embed, hidden) -->
-        <iframe id="bgMusic"
-                style="position:fixed; top:-9999px; left:-9999px; width:1px; height:1px; border:none; pointer-events:none;"
-                allow="autoplay"
-                title="Wedding Music">
-        </iframe>
+        <!-- Background Music -->
+        <audio id="bgMusic" loop preload="auto">
+            <source src="music.mp3" type="audio/mpeg">
+        </audio>
     </section>
 
     <!-- Noi Section -->
@@ -1575,40 +1593,34 @@
             const mainContent = document.getElementById('mainContent');
             const musicBtn = document.getElementById('musicBtn');
             const bgMusic = document.getElementById('bgMusic');
-            const musicSrc = 'https://audio.com/embed/audio/1833653106197833?theme=image';
-            let isMusicPlaying = false;
+            bgMusic.volume = 0.3;
 
             // Toggle music on button click
             musicBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
-                if (isMusicPlaying) {
-                    bgMusic.src = '';
-                    isMusicPlaying = false;
-                    musicBtn.classList.remove('playing');
-                } else {
-                    bgMusic.src = musicSrc;
-                    isMusicPlaying = true;
+                if (bgMusic.paused) {
+                    bgMusic.play();
                     musicBtn.classList.add('playing');
+                } else {
+                    bgMusic.pause();
+                    musicBtn.classList.remove('playing');
                 }
             });
 
             // Handle envelope click to open
             envelopeOverlay.addEventListener('click', function() {
-                // Add opening animation class
                 envelopeOverlay.classList.add('opening');
                 envelopeOverlay.classList.add('hidden');
 
-                // Show main content with fade in
                 setTimeout(function() {
                     mainContent.classList.add('visible');
                 }, 400);
 
                 // Start music when envelope opens
-                bgMusic.src = musicSrc;
-                isMusicPlaying = true;
-                musicBtn.classList.add('playing');
+                bgMusic.play().then(() => {
+                    musicBtn.classList.add('playing');
+                }).catch(() => {});
 
-                // Completely hide envelope after animation
                 setTimeout(function() {
                     envelopeOverlay.classList.add('opened');
                 }, 1200);
