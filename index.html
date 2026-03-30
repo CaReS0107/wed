@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vasile & Victoria - Nunta</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💍</text></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
@@ -433,7 +434,7 @@
 
         /* Music Button */
         .music-btn {
-            position: absolute;
+            position: fixed;
             bottom: 20px;
             right: 20px;
             width: 50px;
@@ -459,6 +460,19 @@
             height: 24px;
             fill: #333;
         }
+
+        .music-btn.playing {
+            animation: musicPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes musicPulse {
+            0%, 100% { box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+            50% { box-shadow: 0 4px 20px rgba(154, 140, 94, 0.5); }
+        }
+
+        .music-btn .icon-pause { display: none; }
+        .music-btn.playing .icon-play { display: none; }
+        .music-btn.playing .icon-pause { display: block; }
 
         /* Falling Petals Animation */
         .petals {
@@ -1110,16 +1124,27 @@
 
         <!-- Main Content -->
         <div class="hero-content">
-            <h1 class="couple-names">Victoria <span class="ampersand">&</span> Vasile</h1>
+            <h1 class="couple-names">Vasile <span class="ampersand">&</span> Victoria</h1>
             <p class="date">11 septembrie 2026</p>
         </div>
 
         <!-- Music Button -->
-        <button class="music-btn">
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <button class="music-btn" id="musicBtn">
+            <svg class="icon-play" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
             </svg>
+            <svg class="icon-pause" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+                <line x1="2" y1="2" x2="22" y2="22" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+            </svg>
         </button>
+
+        <!-- Background Music (audio.com embed, hidden) -->
+        <iframe id="bgMusic"
+                style="position:fixed; top:-9999px; left:-9999px; width:1px; height:1px; border:none; pointer-events:none;"
+                allow="autoplay"
+                title="Wedding Music">
+        </iframe>
     </section>
 
     <!-- Noi Section -->
@@ -1132,13 +1157,13 @@
 
         <!-- Polaroid Photos -->
         <div class="polaroids-container">
-            <div class="polaroid left">
-                <img src="victoria.jpg" alt="Victoria">
-                <div class="polaroid-name">Victoria</div>
-            </div>
             <div class="polaroid right">
                 <img src="vasile.webp" alt="Vasile">
                 <div class="polaroid-name">Vasile</div>
+            </div>
+            <div class="polaroid left">
+                <img src="victoria.jpg" alt="Victoria">
+                <div class="polaroid-name">Victoria</div>
             </div>
         </div>
 
@@ -1209,8 +1234,8 @@
                 <div class="timeline-content">
                     <div class="timeline-date">11 septembrie 2026, ora 14:00</div>
                     <h3 class="timeline-event-title">Ceremonie Religioasă</h3>
-                    <div class="timeline-venue">Biserica Ortodoxă Zlătari</div>
-                    <p class="timeline-address">Adresa - Biserica Ortodoxă Zlătari - Sfântul Ciprian, 12, Calea Victoriei, Centrul Vechi, Sector 3, București</p>
+                    <div class="timeline-venue">Biserica Ortodoxă „Sfântul Apostol Toma”</div>
+                    <p class="timeline-address">Calea Dorobanților, 400124 Cluj-Napoca</p>
                     <a href="https://maps.app.goo.gl/BQg2e8kADp8duFBX9" target="_blank" class="timeline-link">Vezi harta</a>
                 </div>
             </div>
@@ -1548,6 +1573,24 @@
         document.addEventListener('DOMContentLoaded', function() {
             const envelopeOverlay = document.getElementById('envelopeOverlay');
             const mainContent = document.getElementById('mainContent');
+            const musicBtn = document.getElementById('musicBtn');
+            const bgMusic = document.getElementById('bgMusic');
+            const musicSrc = 'https://audio.com/embed/audio/1833653106197833?theme=image';
+            let isMusicPlaying = false;
+
+            // Toggle music on button click
+            musicBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (isMusicPlaying) {
+                    bgMusic.src = '';
+                    isMusicPlaying = false;
+                    musicBtn.classList.remove('playing');
+                } else {
+                    bgMusic.src = musicSrc;
+                    isMusicPlaying = true;
+                    musicBtn.classList.add('playing');
+                }
+            });
 
             // Handle envelope click to open
             envelopeOverlay.addEventListener('click', function() {
@@ -1559,6 +1602,11 @@
                 setTimeout(function() {
                     mainContent.classList.add('visible');
                 }, 400);
+
+                // Start music when envelope opens
+                bgMusic.src = musicSrc;
+                isMusicPlaying = true;
+                musicBtn.classList.add('playing');
 
                 // Completely hide envelope after animation
                 setTimeout(function() {
