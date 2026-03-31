@@ -1529,9 +1529,40 @@
         const ceremonieMarker = createMarker(locations.ceremonie, churchIcon);
         const petrecereMarker = createMarker(locations.petrecere, glassesIcon);
 
+        // Heart markers with labels
+        const heartLocations = [
+            { coords: [45.758153421924874, 28.384652963277663], name: 'Me' },
+            { coords: [47.313951783622585, 27.809220432232646], name: 'You' },
+            { coords: [45.44010662805964, 12.336498768842432], name: 'Yes' }
+        ];
+
+        function createHeartIcon(label) {
+            return L.divIcon({
+                className: 'custom-div-icon',
+                html: `<div style="position: relative; display: flex; flex-direction: column; align-items: center; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.35));">
+                    <svg viewBox="0 0 56 68" width="44" height="54" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M28 62C28 62 4 40 4 18C4 10 10 4 18 4C23 4 26.5 7 28 10C29.5 7 33 4 38 4C46 4 52 10 52 18C52 40 28 62 28 62Z" fill="#9a8c5e"/>
+                        <text x="28" y="32" text-anchor="middle" dominant-baseline="central" fill="white" font-family="Cormorant Garamond, Georgia, serif" font-size="16" font-style="italic" font-weight="600">${label}</text>
+                    </svg>
+                </div>`,
+                iconSize: [44, 54],
+                iconAnchor: [22, 54]
+            });
+        }
+
+        const heartMarkers = heartLocations.map(loc => {
+            const marker = L.marker(loc.coords, { icon: createHeartIcon(loc.name) }).addTo(map);
+            marker.bindTooltip(`<strong>${loc.name}</strong>`, {
+                direction: 'top',
+                offset: [0, -50],
+                className: 'custom-tooltip'
+            });
+            return marker;
+        });
+
         // Fit map to show all markers
-        const group = L.featureGroup([cununieMarker, ceremonieMarker, petrecereMarker]);
-        map.fitBounds(group.getBounds().pad(0.2));
+        const group = L.featureGroup([cununieMarker, ceremonieMarker, petrecereMarker, ...heartMarkers]);
+        map.fitBounds(group.getBounds().pad(0.3));
     </script>
 
     <script>
